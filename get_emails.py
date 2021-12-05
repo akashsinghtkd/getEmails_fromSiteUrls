@@ -2,12 +2,14 @@ import urllib
 import os
 import requests
 import re
-from urllib.parse import urljoin
+# from urllib.parse import urljoin
 from urllib.parse import urlparse
 
-url = 'http://jamtechtechnologies.com/about/'
+url = 'https://www.google.com/'
 protocol = (urllib.parse.urlsplit(url)).scheme
 base_url = urlparse(url).netloc
+regEx_url = protocol+"?:\/\/(.+?\.)?" + base_url + "(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\(\)\*\+,;\=]*)?"
+regEx_email = '[\w.+-]+@[\w-]+\.[\w.-]+'
 allUrls = []
 allEmails = []
 count = 0
@@ -34,8 +36,8 @@ def get_the_url_text(URL):
 
 
 def find_uls(text):
-    global base_url, protocol, allUrls
-    urls = re.findall(protocol+"?:\/\/(.+?\.)?" + base_url + "(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\(\)\*\+,;\=]*)?", text)
+    global base_url, protocol, allUrls, regEx_url
+    urls = re.findall(regEx_url, text)
     url_array = []
     for Url_path in urls:
         full_url = protocol + '://' + base_url + Url_path[1]
@@ -46,14 +48,13 @@ def find_uls(text):
 
 
 def get_emails(text):
-    global allEmails
-    emails = re.findall(r'[\w.+-]+@[\w-]+\.[\w.-]+', text)
+    global allEmails, regEx_email
+    emails = re.findall(regEx_email, text)
     emails = list(dict.fromkeys(emails))
     allEmails = list(dict.fromkeys(emails + allEmails))
 
 
 def urlLoop(text):
-    global allUrls, count, protocol
     urls = list(dict.fromkeys(find_uls(text)))
     if len(urls) > 0:
         for Url in urls:
